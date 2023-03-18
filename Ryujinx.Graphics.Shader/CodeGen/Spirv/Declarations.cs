@@ -434,15 +434,6 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Spirv
 
         private static void DeclareInputOrOutput(CodeGenContext context, IoDefinition ioDefinition, bool isOutput, bool isPerPatch, PixelImap iq = PixelImap.Unused)
         {
-            var dict = isPerPatch
-                ? (isOutput ? context.OutputsPerPatch : context.InputsPerPatch)
-                : (isOutput ? context.Outputs : context.Inputs);
-
-            if (dict.ContainsKey(ioDefinition))
-            {
-                return;
-            }
-
             IoVariable ioVariable = ioDefinition.IoVariable;
             var storageClass = isOutput ? StorageClass.Output : StorageClass.Input;
 
@@ -587,12 +578,11 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Spirv
             }
 
             context.AddGlobalVariable(spvVar);
-            dict.Add(ioDefinition, spvVar);
-        }
 
-        public static void DeclareInvocationId(CodeGenContext context)
-        {
-            DeclareInputOrOutput(context, new IoDefinition(StorageKind.Input, IoVariable.SubgroupLaneId), isOutput: false, isPerPatch: false);
+            var dict = isPerPatch
+                ? (isOutput ? context.OutputsPerPatch : context.InputsPerPatch)
+                : (isOutput ? context.Outputs : context.Inputs);
+            dict.Add(ioDefinition, spvVar);
         }
 
         private static string GetStagePrefix(ShaderStage stage)
