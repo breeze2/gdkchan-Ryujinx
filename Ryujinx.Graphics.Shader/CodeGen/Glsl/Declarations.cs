@@ -215,7 +215,7 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
 
                 if (context.Config.TransformFeedbackEnabled && context.Config.LastInVertexPipeline)
                 {
-                    var tfOutput = context.Info.GetTransformFeedbackOutput(AttributeConsts.PositionX);
+                    var tfOutput = context.Config.GetTransformFeedbackOutput(AttributeConsts.PositionX);
                     if (tfOutput.Valid)
                     {
                         context.AppendLine($"layout (xfb_buffer = {tfOutput.Buffer}, xfb_offset = {tfOutput.Offset}, xfb_stride = {tfOutput.Stride}) out gl_PerVertex");
@@ -552,7 +552,7 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
 
         private static void DeclareInputAttribute(CodeGenContext context, StructuredProgramInfo info, int attr)
         {
-            string suffix = AttributeInfo.IsArrayAttributeGlsl(context.Config.Stage, isOutAttr: false) ? "[]" : string.Empty;
+            string suffix = IsArrayAttributeGlsl(context.Config.Stage, isOutAttr: false) ? "[]" : string.Empty;
             string iq = string.Empty;
 
             if (context.Config.Stage == ShaderStage.Fragment)
@@ -623,13 +623,12 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
 
         private static void DeclareOutputAttribute(CodeGenContext context, int attr)
         {
-            string suffix = AttributeInfo.IsArrayAttributeGlsl(context.Config.Stage, isOutAttr: true) ? "[]" : string.Empty;
+            string suffix = IsArrayAttributeGlsl(context.Config.Stage, isOutAttr: true) ? "[]" : string.Empty;
             string name = $"{DefaultNames.OAttributePrefix}{attr}{suffix}";
 
             if (context.Config.TransformFeedbackEnabled && context.Config.LastInVertexPipeline)
             {
-                int attrOffset = AttributeConsts.UserAttributeBase + attr * 16;
-                int components = context.Config.LastInPipeline ? context.Info.GetTransformFeedbackOutputComponents(attrOffset) : 1;
+                int components = context.Config.LastInPipeline ? context.Config.GetTransformFeedbackOutputComponents(attr, 0) : 1;
 
                 if (components > 1)
                 {
@@ -643,7 +642,7 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
 
                     string xfb = string.Empty;
 
-                    var tfOutput = context.Info.GetTransformFeedbackOutput(attrOffset);
+                    var tfOutput = context.Config.GetTransformFeedbackOutput(attr, 0);
                     if (tfOutput.Valid)
                     {
                         xfb = $", xfb_buffer = {tfOutput.Buffer}, xfb_offset = {tfOutput.Offset}, xfb_stride = {tfOutput.Stride}";
@@ -651,22 +650,20 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
 
                     context.AppendLine($"layout (location = {attr}{xfb}) out {type} {name};");
                 }
-                else
+
+                for (int c = components > 1 ? components : 0; c < 4; c++)
                 {
-                    for (int c = 0; c < 4; c++)
+                    char swzMask = "xyzw"[c];
+
+                    string xfb = string.Empty;
+
+                    var tfOutput = context.Config.GetTransformFeedbackOutput(attr, c);
+                    if (tfOutput.Valid)
                     {
-                        char swzMask = "xyzw"[c];
-
-                        string xfb = string.Empty;
-
-                        var tfOutput = context.Info.GetTransformFeedbackOutput(attrOffset + c * 4);
-                        if (tfOutput.Valid)
-                        {
-                            xfb = $", xfb_buffer = {tfOutput.Buffer}, xfb_offset = {tfOutput.Offset}, xfb_stride = {tfOutput.Stride}";
-                        }
-
-                        context.AppendLine($"layout (location = {attr}, component = {c}{xfb}) out float {name}_{swzMask};");
+                        xfb = $", xfb_buffer = {tfOutput.Buffer}, xfb_offset = {tfOutput.Offset}, xfb_stride = {tfOutput.Stride}";
                     }
+
+                    context.AppendLine($"layout (location = {attr}, component = {c}{xfb}) out float {name}_{swzMask};");
                 }
             }
             else
@@ -687,6 +684,20 @@ namespace Ryujinx.Graphics.Shader.CodeGen.Glsl
                 {
                     context.AppendLine($"layout (location = {attr}) out {type} {name};");
                 }
+            }
+        }
+
+        private static bool IsArrayAttributeGlsl(ShaderStage stage, bool isOutAttr)
+        {
+            if (isOutAttr)
+            {
+                return stage == ShaderStage.TessellationControl;
+            }
+            else
+            {
+                return stage == ShaderStage.TessellationControl ||
+                       stage == ShaderStage.TessellationEvaluation ||
+                       stage == ShaderStage.Geometry;
             }
         }
 
