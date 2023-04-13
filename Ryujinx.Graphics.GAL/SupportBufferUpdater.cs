@@ -80,6 +80,13 @@ namespace Ryujinx.Graphics.GAL
             MarkDirty(SupportBuffer.ViewportInverseOffset, SupportBuffer.FieldSize);
         }
 
+        public void UpdateViewportSize(Vector4<float> data)
+        {
+            Data.ViewportSize = data;
+
+            MarkDirty(SupportBuffer.ViewportSizeOffset, SupportBuffer.FieldSize);
+        }
+
         public void Commit()
         {
             if (_startOffset != -1)

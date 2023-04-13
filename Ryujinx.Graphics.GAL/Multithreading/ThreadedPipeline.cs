@@ -323,9 +323,9 @@ namespace Ryujinx.Graphics.GAL.Multithreading
             _renderer.QueueCommand();
         }
 
-        public void SetViewports(ReadOnlySpan<Viewport> viewports, bool disableTransform)
+        public void SetViewports(ReadOnlySpan<Viewport> viewports, bool disableTransform, bool yNegate)
         {
-            _renderer.New<SetViewportsCommand>().Set(_renderer.CopySpan(viewports), disableTransform);
+            _renderer.New<SetViewportsCommand>().Set(_renderer.CopySpan(viewports), disableTransform, yNegate);
             _renderer.QueueCommand();
         }
 

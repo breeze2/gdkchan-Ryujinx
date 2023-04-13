@@ -272,7 +272,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             var bufferRanges = new BufferRange(bufferHandle, 0, rangeSize);
             _pipeline.SetUniformBuffers(stackalloc[] { new BufferAssignment(2, bufferRanges) });
             _pipeline.SetScissors(scissors);
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
             _pipeline.SetImage(0, _edgeOutputTexture, GAL.Format.R8G8B8A8Unorm);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);
             _pipeline.ComputeBarrier();
@@ -286,7 +286,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             _pipeline.SetTextureAndSampler(ShaderStage.Compute, 4, _searchTexture, _samplerLinear);
             _pipeline.SetUniformBuffers(stackalloc[] { new BufferAssignment(2, bufferRanges) });
             _pipeline.SetScissors(scissors);
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
             _pipeline.SetImage(0, _blendOutputTexture, GAL.Format.R8G8B8A8Unorm);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);
             _pipeline.ComputeBarrier();
@@ -299,7 +299,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             _pipeline.SetTextureAndSampler(ShaderStage.Compute, 1, view, _samplerLinear);
             _pipeline.SetUniformBuffers(stackalloc[] { new BufferAssignment(2, bufferRanges) });
             _pipeline.SetScissors(scissors);
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
             _pipeline.SetImage(0, _outputTexture, GAL.Format.R8G8B8A8Unorm);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);
             _pipeline.ComputeBarrier();

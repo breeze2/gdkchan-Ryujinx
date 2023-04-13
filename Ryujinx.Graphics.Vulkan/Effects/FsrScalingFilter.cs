@@ -170,7 +170,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             var bufferRanges = new BufferRange(bufferHandle, 0, rangeSize);
             _pipeline.SetUniformBuffers(stackalloc[] { new BufferAssignment(2, bufferRanges) });
             _pipeline.SetScissors(scissors);
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
             _pipeline.SetImage(0, _intermediaryTexture, GAL.Format.R8G8B8A8Unorm);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);
             _pipeline.ComputeBarrier();
@@ -194,7 +194,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             var sharpeningRange = new BufferRange(sharpeningBufferHandle, 0, sizeof(float));
             _pipeline.SetUniformBuffers(stackalloc[] { new BufferAssignment(4, sharpeningRange) });
             _pipeline.SetScissors(scissors);
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
             _pipeline.SetImage(0, destinationTexture);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);
             _pipeline.ComputeBarrier();

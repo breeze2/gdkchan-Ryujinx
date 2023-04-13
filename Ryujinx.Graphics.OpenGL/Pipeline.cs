@@ -1407,7 +1407,7 @@ namespace Ryujinx.Graphics.OpenGL
             _vertexArray.SetVertexBuffers(vertexBuffers);
         }
 
-        public void SetViewports(ReadOnlySpan<Viewport> viewports, bool disableTransform)
+        public void SetViewports(ReadOnlySpan<Viewport> viewports, bool disableTransform, bool yNegate)
         {
             Array.Resize(ref _viewportArray, viewports.Length * 4);
             Array.Resize(ref _depthRangeArray, viewports.Length * 2);
@@ -1458,6 +1458,24 @@ namespace Ryujinx.Graphics.OpenGL
                     Z = 1,
                     W = disableTransformF
                 });
+            }
+
+            if (yNegate)
+            {
+                float width = viewports[0].Region.Width;
+                float height = viewports[0].Region.Height;
+
+                if (_supportBuffer.Data.ViewportSize.X != width ||
+                    _supportBuffer.Data.ViewportSize.Y != height)
+                {
+                    _supportBuffer.UpdateViewportSize(new Vector4<float>
+                    {
+                        X = viewports[0].Region.Width,
+                        Y = viewports[0].Region.Height,
+                        Z = 1,
+                        W = 0
+                    });
+                }
             }
         }
 

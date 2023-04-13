@@ -111,7 +111,7 @@ namespace Ryujinx.Graphics.Vulkan.Effects
             var dispatchY = BitUtils.DivRoundUp(view.Height, IPostProcessingEffect.LocalGroupSize);
 
             _pipeline.SetScissors(stackalloc[] { new Rectangle<int>(0, 0, view.Width, view.Height) });
-            _pipeline.SetViewports(viewports, false);
+            _pipeline.SetViewports(viewports);
 
             _pipeline.SetImage(0, _texture, GAL.Format.R8G8B8A8Unorm);
             _pipeline.DispatchCompute(dispatchX, dispatchY, 1);

@@ -1259,7 +1259,12 @@ namespace Ryujinx.Graphics.Vulkan
             SignalStateChange();
         }
 
-        public void SetViewports(ReadOnlySpan<GAL.Viewport> viewports, bool disableTransform)
+        public void SetViewports(ReadOnlySpan<GAL.Viewport> viewports)
+        {
+            SetViewports(viewports, false, false);
+        }
+
+        public void SetViewports(ReadOnlySpan<GAL.Viewport> viewports, bool disableTransform, bool yNegate)
         {
             int maxViewports = Gd.Capabilities.SupportsMultiView ? Constants.MaxViewports : 1;
             int count = Math.Min(maxViewports, viewports.Length);
@@ -1295,6 +1300,24 @@ namespace Ryujinx.Graphics.Vulkan
                     Z = 1,
                     W = disableTransformF
                 });
+            }
+
+            if (yNegate)
+            {
+                float width = MathF.Abs(viewports[0].Region.Width);
+                float height = MathF.Abs(viewports[0].Region.Height);
+
+                if (SupportBufferUpdater.Data.ViewportSize.X != width ||
+                    SupportBufferUpdater.Data.ViewportSize.Y != height)
+                {
+                    SupportBufferUpdater.UpdateViewportSize(new Vector4<float>
+                    {
+                        X = width,
+                        Y = height,
+                        Z = 1,
+                        W = 0
+                    });
+                }
             }
 
             _newState.ViewportsCount = (uint)count;

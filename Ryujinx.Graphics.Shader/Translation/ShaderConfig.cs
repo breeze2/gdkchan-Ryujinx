@@ -154,7 +154,17 @@ namespace Ryujinx.Graphics.Shader.Translation
             _usedTextures = new Dictionary<TextureInfo, TextureMeta>();
             _usedImages   = new Dictionary<TextureInfo, TextureMeta>();
 
-            Properties = new ShaderProperties();
+            switch (stage)
+            {
+                case ShaderStage.Fragment:
+                    bool originUpperLeft = options.TargetApi == TargetApi.Vulkan || gpuAccessor.QueryYNegateEnabled();
+                    Properties = new ShaderProperties(originUpperLeft);
+                    break;
+                default:
+                    Properties = new ShaderProperties();
+                    break;
+            }
+
             ResourceManager = new ResourceManager(stage, gpuAccessor, Properties);
         }
 
