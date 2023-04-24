@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs: {}
   push:
-    branches: [ master, true-gmem ]
+    branches: [ master, true-gmem, true-gmem-build ]
   #  paths-ignore:
   #    - '.github/*'
   #    - '.github/ISSUE_TEMPLATE/**'
