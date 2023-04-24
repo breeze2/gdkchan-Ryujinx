@@ -3,8 +3,8 @@ name: Build job
 on:
   workflow_dispatch:
     inputs: {}
-  #push:
-  #  branches: [ master ]
+  push:
+    branches: [ master, true-gmem ]
   #  paths-ignore:
   #    - '.github/*'
   #    - '.github/ISSUE_TEMPLATE/**'
